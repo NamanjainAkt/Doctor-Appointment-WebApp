@@ -3,3 +3,19 @@
 .active hr{
     @apply block;
 }
+
+::-webkit-scrollbar{
+    @apply hidden;
+}
+
+/* Add temporary debug border */
+.debug-border {
+  border: 1px solid red;
+}
+
+/* Ensure elements aren't hidden */
+.your-specialty-container {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+}
