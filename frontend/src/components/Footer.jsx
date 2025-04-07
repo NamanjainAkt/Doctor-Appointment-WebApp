@@ -8,7 +8,7 @@ const Footer = () => {
         {/* {------left section----------} */}
         <div>
             <img className='mb-5 w-40' src={assets.logo} alt="" />
-            <p className='w-full md:w-2/3 text-gray-600 leading-6 '>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ratione asperiores cum deserunt dolorem doloribus repellat officia et, libero inventore voluptatibus quasi debitis quas optio iste quo animi? Nesciunt, saepe ipsum?</p>
+            <p className='w-full md:w-2/3 text-gray-600 leading-6 '>DocSched is committed to excellence in healthcare technology. We continuously strive to enhance our platform, integrating the latest advancements to improve user experience and deliver superior service. Whether you're booking your first appointment or managing ongoing care, DocSched is here to support you every step of the way.</p>
         </div>
         {/* {------center section----------} */}
         <div>
@@ -16,7 +16,7 @@ const Footer = () => {
             <ul className='flex flex-col gap-2 text-gray-600'>
                 <li>Home</li>
                 <li>About us</li>
-                <li>COntact us</li>
+                <li>Contact us</li>
                 <li>Privacy Policy</li>
             </ul>
         </div>
@@ -25,7 +25,7 @@ const Footer = () => {
             <p className='text-xl font-medium mb-5'>GET IN TOUCH</p>
             <ul className='flex flex-col gap-2 text-gray-600'>
                 <li>+91 9999999998</li>
-                <li>abc@abc.com</li>
+                <li>nyctosde@gmail.com</li>
             </ul>
         </div>
       </div>

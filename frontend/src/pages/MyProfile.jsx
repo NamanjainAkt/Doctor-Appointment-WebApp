@@ -9,7 +9,7 @@ const MyProfile = () => {
     phone: "9999999997",
     address: {
       line1: "smriti nagar",
-      line2: "nhilai"
+      line2: "bhilai"
     },
     gender: "male",
     dob: "30-03-2005"
