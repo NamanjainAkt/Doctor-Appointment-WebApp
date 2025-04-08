@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import {v2 as cloudinary} from "cloudinary";
 import doctorModel from "../models/doctormodel.js";  // Fixed casing here
 import jwt from "jsonwebtoken";
+import 'dotenv/config';
 
 
 
@@ -66,19 +67,24 @@ const addDoctor = async (req, res) => {
 //adpi for the admin login
 
 const loginAdmin = async (req, res) => {
-    try{
-        const {email, password} = req.body;
-        if(email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD){
-            const token = jwt.sign(email+password,process.env.JWT_SECRET)
-            res.json({success:true,token})
-        }else{
-            res.json({success:false,message: "Invalid credentials"})
+    try {
+        const { email, password } = req.body;
+
+        if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
+            const token = jwt.sign(
+                process.env.ADMIN_EMAIL + process.env.ADMIN_PASSWORD,
+                process.env.JWT_SECRET
+            );
+            res.json({ success: true, message: "Login successful", token });
+        } else {
+            res.json({ success: false, message: "Invalid credentials" });
         }
+    } catch (error) {
+        console.error(error);
+        res.json({ success: false, message: "Something went wrong" });
     }
-    catch(error){
-        console.log(error);
-        res.json({success:false,message: "something went wrong"});
-    }
-}
+};
+
+export { loginAdmin };  // Add this export
 
 export default {addDoctor,loginAdmin};

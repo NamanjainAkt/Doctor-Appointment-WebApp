@@ -43,15 +43,15 @@ const doctorSchema = new mongoose.Schema({
         required: true,
     },
     address: {
-        type: Object,
-        required: true,
+        type: Object,  // Changed from Objects to Object
+        required: true
     },
     date: {
         type: Number,
         default: Date.now,
     },
     slots_booked: {
-        type: Objects,
+        type: Object,  // Changed from Objects to Object
         default: {},
     },
 }, { minimize: false });
