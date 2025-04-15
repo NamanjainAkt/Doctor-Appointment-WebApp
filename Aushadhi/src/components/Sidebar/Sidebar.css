@@ -3,15 +3,17 @@
     display: inline-flex;
     flex-direction: column;
     justify-content: space-between;
-    background: #e0e0e0;
+    background: #1a1a1af9;
     padding: 25px 15px;
     transition: all 0.3s ease;
     width: 70px;
     overflow: hidden;
+    border-right: aquamarine solid 1px;
 }
 
 .Sidebar.extended {
     width: 250px;
+    border-right: aquamarine solid 1px;
 }
 
 .Sidebar img{
@@ -22,7 +24,14 @@
     display: block;
     margin-left: 10px;
     cursor: pointer;
+    border: 1px solid aquamarine;
 
+}
+
+.Sidebar.menu img{
+    width: 25px;
+    height: 25px; 
+    filter: invert(100%);
 }
 .Sidebar .new-chat{
     margin-top: 50px;

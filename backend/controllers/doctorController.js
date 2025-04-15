@@ -72,4 +72,21 @@ const deleteDoctor = async (req, res) => {
     }
 };
 
-export { getAllDoctors, getDoctor, updateDoctorStatus, deleteDoctor };
+const changeAvailability = async (req, res) => {
+    try {
+        const {docId} = req.body
+        const docData = await doctorModel.findById(docId)
+        await doctorModel.findByIdAndUpdate(docId, {
+            Available: !docData.Available
+        })
+        res.json({ success: true, message: 'Availability changed successfully' });
+
+    } catch (error) {
+        console.error('Error in changeAvailability:', error);
+        res.status(500).json({ success: false, message: 'Failed to change availability' });
+    }
+}
+
+
+
+export { getAllDoctors, getDoctor, updateDoctorStatus, deleteDoctor, changeAvailability };

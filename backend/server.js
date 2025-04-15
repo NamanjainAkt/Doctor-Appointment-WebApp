@@ -16,10 +16,7 @@ app.use(express.json());
 app.use(cors());
 
 // api endpoints
-app.use('/admin', adminRouter);
-app.use('/api/admin', (req, res) => {
-  res.send('Hello from admin');
-});
+app.use('/api/admin', adminRouter);
 
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);

@@ -114,4 +114,19 @@ const loginAdmin = async (req, res) => {
     }
 };
 
-export { loginAdmin, addDoctor };
+// API to get all doctors list
+
+const allDoctors = async (req, res) => {
+    try {
+        const doctors = await doctorModel.find({}).select('-password'); // Exclude password from the response
+        res.json({success: true, message: "Doctors fetched successfully", doctors});
+    } catch (error) {
+        console.error(error);
+        res.json({success: false, message: "Something went wrong"});
+    }
+};
+
+
+
+
+export { loginAdmin, addDoctor, allDoctors };

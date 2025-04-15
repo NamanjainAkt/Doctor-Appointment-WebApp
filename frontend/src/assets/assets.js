@@ -204,7 +204,7 @@ export const doctors = [
         image: doc9,
         speciality: 'Gastroenterologist',
         degree: 'MBBS, DM (Gastro)',
-        experience: '11 Years',
+        experience: '10 Years',
         about: 'Dr. Sinha specializes in liver, pancreas, and gastrointestinal disorders.',
         fees: 800,
         address: {
@@ -288,7 +288,7 @@ export const doctors = [
         image: doc15,
         speciality: 'Gastroenterologist',
         degree: 'MBBS, DM (Gastro)',
-        experience: '12 Years',
+        experience: '10 Years',
         about: 'Dr. Joshi provides expert treatment for digestive disorders, ulcers, and liver diseases.',
         fees: 750,
         address: {
