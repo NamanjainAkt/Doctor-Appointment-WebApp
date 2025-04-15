@@ -1,14 +1,17 @@
 import React, { useContext } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { AppContext } from '../context/AppContext'
 import { useState } from 'react'
 import { useEffect } from 'react'
 import { assets } from '../assets/assets'
 import RelatedDoctors from '../components/RelatedDoctors'
+import { ToastContainer, toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 const Appointment = () => {
   const { docId } = useParams()
-  const { doctors, currencySymbol } = useContext(AppContext)
+  const navigate = useNavigate()
+  const { doctors, currencySymbol, addAppointment } = useContext(AppContext)
   const daysOfWeek = ['SUN','MON','TUE','WED','THU','FRI','SAT']
   const [docInfo, setDocInfo] = useState(null)
   const [docSlots, setDocSlots] = useState([])
@@ -73,6 +76,8 @@ const Appointment = () => {
   },[])
 
   return docInfo && (
+    <>
+      <ToastContainer position="top-right" autoClose={3000} />
     <div>
       {/* {----------Doctor details--------} */}
       <div className='flex flex-cols sm:flex-row gap-4'>
@@ -120,13 +125,54 @@ const Appointment = () => {
               </p>
           ))}
         </div>
-        <button className='bg-[#5f6fff] text-white text-sm font-light px-14 py-3 rounded-full my-6 '>
+        <button 
+          onClick={() => {
+            if (!slotTime) {
+              toast.error('Please select a time slot')
+              return
+            }
+
+            // Check if user is logged in
+            const userToken = localStorage.getItem('userToken')
+            const userInfo = localStorage.getItem('userInfo')
+            
+            if (!userToken || !userInfo) {
+              toast.error('Please login to book an appointment')
+              navigate('/login')
+              return
+            }
+
+            try {
+              const user = JSON.parse(userInfo)
+              const selectedDate = docSlots[slotIndex][0].datetime
+              
+              // Create appointment object
+              const appointment = {
+                doctorId: docInfo._id,
+                appointmentDate: selectedDate,
+                appointmentTime: slotTime,
+                patientName: user.name,
+                patientEmail: user.email
+              }
+
+              // Add appointment using context
+              addAppointment(appointment)
+              toast.success('Appointment booked successfully!')
+              navigate('/my-appointment')
+            } catch (error) {
+              console.error('Error booking appointment:', error)
+              toast.error('Failed to book appointment. Please try again.')
+            }
+          }} 
+          className='bg-[#5f6fff] text-white text-sm font-light px-14 py-3 rounded-full my-6 hover:bg-[#4f5fee] transition-all duration-300'
+        >
           Book Appointment
         </button>
       </div>
       {/* Listing Related Doctors */}
       <RelatedDoctors docId={docId} speciality = {docInfo.speciality}/>
     </div>
+    </>
   )
 }
 
