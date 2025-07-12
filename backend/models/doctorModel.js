@@ -1,6 +1,11 @@
 import mongoose from "mongoose";
 
 const doctorSchema = new mongoose.Schema({
+    externalId: {
+        type: String,
+        unique: true,
+        sparse: true // Allows null values and only enforces uniqueness on non-null values
+    },
     name: {
         type: String,
         required: true,

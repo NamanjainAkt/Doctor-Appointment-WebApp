@@ -4,13 +4,13 @@ import { assets } from '../../assets/assets'
 import { Context } from '../../context/Context'
 
 const Main = () => {
-    const { 
-        input, 
-        setInput, 
-        loading, 
-        onSent, 
-        recentPrompt, 
-        showResult, 
+    const {
+        input,
+        setInput,
+        loading,
+        onSent,
+        recentPrompt,
+        showResult,
         resultData,
         resetChat,
         isTyping,
@@ -40,7 +40,7 @@ const Main = () => {
                     >
                         {theme === 'light' ? '🌙' : '☀️'}
                     </button>
-                    <img src={assets.user_icon} alt="" />
+                    <img src={theme === 'dark' ? assets.user_icon_white : assets.user_icon} alt="" />
                 </div>
             </div>
             <div className="main-container">
@@ -93,8 +93,8 @@ const Main = () => {
                 <div className="main-bottom">
                     <div className="search-box">
                         <input 
-                            type="text" 
-                            placeholder='Enter A Prompt' 
+                            type="text"
+                            placeholder='Enter A Prompt'
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
                             onKeyDown={handleKeyDown}
@@ -107,11 +107,9 @@ const Main = () => {
                                 <div className={`toggle-switch ${isTyping ? 'active' : ''}`}></div>
                                 <span>Typing {isTyping ? 'On' : 'Off'}</span>
                             </div>
-                            <img src={assets.gallery_icon} alt="" />
-                            <img src={assets.mic_icon} alt="" />
                             <img 
-                                src={assets.send_icon} 
-                                alt="" 
+                                src={assets.send_icon}
+                                alt=""
                                 onClick={() => onSent(input)}
                             />
                         </div>

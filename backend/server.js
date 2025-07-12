@@ -6,6 +6,8 @@ import connectCloudinary from './config/cloudinary.js';
 import adminRouter from './routes/adminRoute.js';
 import appointmentRouter from './routes/appointmentRoute.js';
 import paymentRouter from './routes/paymentRoute.js';
+import userRouter from './routes/userRoute.js';
+import doctorRouter from './routes/doctorRoute.js';
 
 // app config
 const app = express();
@@ -21,6 +23,8 @@ app.use(cors());
 app.use('/api/admin', adminRouter);
 app.use('/api/appointments', appointmentRouter);
 app.use('/api/payments', paymentRouter);
+app.use('/api/users', userRouter);
+app.use('/api/doctors', doctorRouter);
 
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);

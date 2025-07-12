@@ -1,24 +1,85 @@
-import React from 'react'
+import React, { useContext, useEffect } from 'react'
 import { useState } from 'react'
+import { AppContext } from '../context/AppContext'
+import { ToastContainer, toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
+import { useNavigate } from 'react-router-dom'
 import { assets } from '../assets/assets'
-const MyProfile = () => {
-  const [userData, setUserData] = useState({
-    name: "naman",
-    image: assets.profile_pic,
-    email: "Naman@xyz.com",
-    phone: "9999999997",
-    address: {
-      line1: "smriti nagar",
-      line2: "bhilai"
-    },
-    gender: "male",
-    dob: "30-03-2005"
 
+const MyProfile = () => {
+  const { user, token, setUser } = useContext(AppContext)
+  const navigate = useNavigate()
+  
+  const [userData, setUserData] = useState({
+    name: "",
+    image: "",
+    email: "",
+    phone: "",
+    address: {
+      line1: "",
+      line2: ""
+    },
+    gender: "",
+    dob: ""
   })
+  
   const [isEdit, setIsEdit] = useState(false)
+  const [loading, setLoading] = useState(false)
+  
+  // Redirect if not logged in
+  useEffect(() => {
+    if (!token || !user) {
+      navigate('/login')
+      return
+    }
+    
+    // Load user data from context
+    if (user) {
+      setUserData({
+        name: user.name || "",
+        image: user.image || assets.profile_pic,
+        email: user.email || "",
+        phone: user.phone || "",
+        address: user.address || { line1: "", line2: "" },
+        gender: user.gender || "",
+        dob: user.dob || ""
+      })
+    }
+  }, [user, token, navigate])
+  
+  const handleSave = async () => {
+    try {
+      setLoading(true)
+      const response = await fetch('/api/users/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(userData)
+      })
+      
+      const data = await response.json()
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to update profile')
+      }
+      
+      // Update localStorage and context with new user data
+      localStorage.setItem('userInfo', JSON.stringify(data))
+      setUser(data)
+      
+      toast.success('Profile updated successfully')
+      setIsEdit(false)
+    } catch (error) {
+      toast.error(error.message || 'Something went wrong')
+    } finally {
+      setLoading(false)
+    }
+  }
   return (
     <div className='max-w-lg flex flex-col gap-2 text-sm'>
-      <img className='w-36 rounded' src={userData.image} alt="" />
+      <img className='w-36 rounded' src={userData.image || assets.profile_pic} alt="User profile" />
       {
         isEdit
           ? <input className='bg-gray-50 text-3xl font-medium max-w-60 mt-4' type="text" value={userData.name} onChange={(e) => setUserData(prev => ({ ...prev, name: e.target.value }))} />
@@ -76,13 +137,15 @@ const MyProfile = () => {
         {isEdit
           ? <button 
                 className='border border-[#5f6fff] px-8 py-2 rounded-full hover:bg-[#5f6fff] hover:text-white hover:scale-110 transition-all duration-300 ease-in-out' 
-                onClick={() => setIsEdit(false)}
+                onClick={handleSave}
+                disabled={loading}
             >
-                Save Information
+                {loading ? 'Saving...' : 'Save Information'}
             </button>
           : <button className='border border-[#5f6fff] px-8 py-2 rounded-full hover:bg-[#5f6fff] hover:text-white transition-all' onClick={() => setIsEdit(true)} >Edit</button>}
       </div>
 
+      <ToastContainer />
     </div>
   )
 }

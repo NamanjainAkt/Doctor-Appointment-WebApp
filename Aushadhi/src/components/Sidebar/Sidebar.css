@@ -3,7 +3,7 @@
     display: inline-flex;
     flex-direction: column;
     justify-content: space-between;
-    background: #1a1a1af9;
+    background: var(--sidebar-bg);
     padding: 25px 15px;
     transition: all 0.3s ease;
     width: 70px;
@@ -39,10 +39,10 @@
     align-items: center;
     gap: 10px;
     padding: 10px 15px;
-    background: #e6eaf1;
+    background: var(--card-bg);
     border-radius: 50px;
     font-size: 14px;
-    color: grey;
+    color: var(--text-secondary);
     cursor: pointer;
     white-space: nowrap;
     transition: all 0.3s ease;
@@ -65,7 +65,7 @@
 margin-top: 10px;
 margin-bottom: 15px;
 font-size: 14px;
-color: #666;
+color: var(--text-secondary);
 padding-left: 15px;
 }
 .Sidebar .recent-entry{
@@ -75,7 +75,7 @@ padding-left: 15px;
     padding: 10px;
     padding-right: 15px;
     border-radius: 10px;
-    color: #282828;
+    color: var(--text-primary);
     cursor: pointer;
     white-space: nowrap;
     overflow: hidden;
@@ -89,7 +89,7 @@ padding-left: 15px;
     font-size: 14px;
 }
 .Sidebar .recent-entry:hover{
-    background-color: #e2e6eb;
+    background-color: var(--card-hover);
 }
 .Sidebar .bottom{
     display: flex;
@@ -103,7 +103,7 @@ padding-left: 15px;
     transition: background-color 0.2s ease;
 }
 .Sidebar .bottom-item:hover {
-    background-color: #e2e6eb;
+    background-color: var(--card-hover);
 }
 
 /* Responsive styles */

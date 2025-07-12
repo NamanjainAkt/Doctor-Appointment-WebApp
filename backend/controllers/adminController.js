@@ -98,16 +98,21 @@ const loginAdmin = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Email and password are required' });
         }
 
-        if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
-            const token = jwt.sign(
-                { email: process.env.ADMIN_EMAIL, role: 'admin' },
-                process.env.JWT_SECRET,
-                { expiresIn: '1d' }
-            );
-            res.json({ success: true, message: "Login successful", token });
-        } else {
-            res.json({ success: false, message: "Invalid credentials" });
+        const admin = await doctorModel.findOne({ email: email, role: 'admin' });
+        if (!admin) {
+            return res.status(401).json({ success: false, message: "Invalid credentials" });
         }
+        const passwordMatch = await bcrypt.compare(password, admin.password);
+        if (!passwordMatch) {
+            return res.status(401).json({ success: false, message: "Invalid credentials" });
+        }
+
+        const token = jwt.sign(
+            { email: admin.email, role: 'admin' },
+            process.env.JWT_SECRET,
+            { expiresIn: '1d' }
+        );
+        res.json({ success: true, message: "Login successful", token });
     } catch (error) {
         console.error(error);
         res.json({ success: false, message: "Something went wrong" });
@@ -128,5 +133,170 @@ const allDoctors = async (req, res) => {
 
 
 
+// Add this to your existing adminController.js
 
-export { loginAdmin, addDoctor, allDoctors };
+// API for doctor login
+const loginDoctor = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({ success: false, message: 'Email and password are required' });
+        }
+
+        const doctor = await doctorModel.findOne({ email: email });
+        if (!doctor) {
+            return res.status(401).json({ success: false, message: "Invalid credentials" });
+        }
+        const passwordMatch = await bcrypt.compare(password, doctor.password);
+        if (!passwordMatch) {
+            return res.status(401).json({ success: false, message: "Invalid credentials" });
+        }
+
+        const token = jwt.sign(
+            { email: doctor.email, id: doctor._id, role: 'doctor' },
+            process.env.JWT_SECRET,
+            { expiresIn: '1d' }
+        );
+        res.json({ success: true, message: "Login successful", token });
+    } catch (error) {
+        console.error(error);
+        res.json({ success: false, message: "Something went wrong" });
+    }
+};
+
+// Get doctor profile
+const getDoctorProfile = async (req, res) => {
+    try {
+        const doctorId = req.doctor.id;
+        const doctor = await doctorModel.findById(doctorId).select('-password');
+        
+        if (!doctor) {
+            return res.status(404).json({ success: false, message: "Doctor not found" });
+        }
+        
+        res.json({ success: true, doctor });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: "Something went wrong" });
+    }
+};
+
+// Update doctor profile
+const updateDoctorProfile = async (req, res) => {
+    try {
+        const doctorId = req.doctor.id;
+        const { name, speciality, experience, about, fees, address, degree } = req.body;
+        
+        // Build update object
+        const updateData = {};
+        if (name) updateData.name = name;
+        if (speciality) updateData.speciality = speciality;
+        if (experience) updateData.experience = experience;
+        if (about) updateData.about = about;
+        if (fees) updateData.fees = Number(fees);
+        if (degree) updateData.degree = degree;
+        
+        // Handle address update
+        if (address) {
+            try {
+                updateData.address = typeof address === 'string' ? JSON.parse(address) : address;
+            } catch (error) {
+                return res.status(400).json({ success: false, message: "Invalid address format" });
+            }
+        }
+        
+        // Handle image update if provided
+        if (req.file) {
+            try {
+                const imageUpload = await cloudinary.uploader.upload(req.file.path, {resource_type: "image"});
+                updateData.image = imageUpload.secure_url;
+            } catch (error) {
+                console.error('Cloudinary upload error:', error);
+                return res.status(500).json({ success: false, message: "Failed to upload image" });
+            }
+        }
+        
+        // Update doctor profile
+        const doctor = await doctorModel.findByIdAndUpdate(
+            doctorId,
+            updateData,
+            { new: true }
+        ).select('-password');
+        
+        if (!doctor) {
+            return res.status(404).json({ success: false, message: "Doctor not found" });
+        }
+        
+        res.json({ success: true, message: "Profile updated successfully", doctor });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: "Something went wrong" });
+    }
+};
+
+// Get doctor's appointments
+const getDoctorAppointments = async (req, res) => {
+    try {
+        const doctorId = req.doctor.id;
+        
+        const appointments = await appointmentModel.find({ doctor: doctorId })
+            .sort({ appointmentDate: -1, appointmentTime: 1 });
+        
+        res.json({ success: true, appointments });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: "Something went wrong" });
+    }
+};
+
+// Get doctor's patients (unique patients from appointments)
+const getDoctorPatients = async (req, res) => {
+    try {
+        const doctorId = req.doctor.id;
+        
+        // Get all appointments for this doctor
+        const appointments = await appointmentModel.find({ doctor: doctorId });
+        
+        // Extract unique patients
+        const uniquePatients = [];
+        const patientEmails = new Set();
+        
+        appointments.forEach(appointment => {
+            if (!patientEmails.has(appointment.patientEmail)) {
+                patientEmails.add(appointment.patientEmail);
+                uniquePatients.push({
+                    name: appointment.patientName,
+                    email: appointment.patientEmail,
+                    lastAppointment: appointment.appointmentDate,
+                    appointmentCount: 1
+                });
+            } else {
+                // Update existing patient data
+                const patient = uniquePatients.find(p => p.email === appointment.patientEmail);
+                if (patient) {
+                    patient.appointmentCount += 1;
+                    if (new Date(appointment.appointmentDate) > new Date(patient.lastAppointment)) {
+                        patient.lastAppointment = appointment.appointmentDate;
+                    }
+                }
+            }
+        });
+        
+        res.json({ success: true, patients: uniquePatients });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: "Something went wrong" });
+    }
+};
+
+export {
+  allDoctors,
+  loginAdmin,
+  addDoctor,
+  loginDoctor,
+  getDoctorProfile,
+  updateDoctorProfile,
+  getDoctorAppointments,
+  getDoctorPatients
+};

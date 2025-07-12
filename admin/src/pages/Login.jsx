@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { assets } from '../assets/assets'
 import { useContext } from 'react'
 import { AdminContext } from '../context/AdminContext.jsx'
+import { DoctorContext } from '../context/DoctorContext.jsx'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
@@ -13,12 +14,13 @@ const Login = () => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const { setAToken, backendUrl } = useContext(AdminContext)
+    const { setDToken } = useContext(DoctorContext)
 
     const onSubmitHandler = async (event) => {
         event.preventDefault()
         try {
             if (state === 'Admin') {
-                const {data} = await axios.post(`${backendUrl}/admin/login`, {
+                const {data} = await axios.post(`${backendUrl}/api/admin/login`, {
                     email,
                     password
                 }, {
@@ -30,7 +32,25 @@ const Login = () => {
                 if (data.success) {
                     localStorage.setItem('aToken', data.token)
                     setAToken(data.token)
-                    navigate('/admin/doctors-list')
+                    navigate('/admin-dashboard')
+                    toast.success('Login successful')
+                } else {
+                    toast.error(data.message || 'Login failed')
+                }
+            } else if (state === 'Doctor') {
+                const {data} = await axios.post(`${backendUrl}/api/admin/doctor-login`, {
+                    email,
+                    password
+                }, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                
+                if (data.success) {
+                    localStorage.setItem('dToken', data.token)
+                    setDToken(data.token)
+                    navigate('/doctor-dashboard')
                     toast.success('Login successful')
                 } else {
                     toast.error(data.message || 'Login failed')

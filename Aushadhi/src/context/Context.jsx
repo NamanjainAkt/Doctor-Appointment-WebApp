@@ -10,11 +10,17 @@ const ContextProvider = (props) => {
     const [loading, setLoading] = useState(false);
     const [resultData, setResultData] = useState("");
     const [isTyping, setIsTyping] = useState(false);
+    const [theme, setTheme] = useState('dark');
 
     const delayPara = (index, nextWord) => {
         setTimeout(() => {
             setResultData(prev => prev + (index === 0 ? '' : ' ') + nextWord);
         }, 75 * index);
+    };
+    
+    const onThemeChange = () => {
+        setTheme(prev => prev === 'light' ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme === 'light' ? 'dark' : 'light');
     };
 
     const resetChat = () => {
@@ -107,9 +113,12 @@ const ContextProvider = (props) => {
         onSent,
         resetChat,
         isTyping,
-        setIsTyping
+        setIsTyping,
+        theme,
+        setTheme,
+        onThemeChange
     };
-    
+
     return (
         <Context.Provider value={contextValue}>
             {props.children}

@@ -5,7 +5,7 @@ import { Context } from '../../context/Context'
 
 const Sidebar = () => {
   const [extended, setExtended] = React.useState(false);
-  const { onSent, resetChat, prevPrompts } = useContext(Context);
+  const { onSent, resetChat, prevPrompts, theme } = useContext(Context);
 
   const handlePromptClick = (prompt) => {
     onSent(prompt);
@@ -20,9 +20,9 @@ const Sidebar = () => {
     <div className={`Sidebar ${extended ? 'extended' : ''}`}>
       <div className="top">
         <img 
-          src={assets.menu_icon} 
+          src={ assets.menu_icon}
           className='menu' 
-          onClick={() => setExtended(!extended)} 
+          onClick={() => setExtended(!extended)}
           alt="Menu"
         />
         <div className="new-chat" onClick={handleNewChat}>
@@ -35,7 +35,7 @@ const Sidebar = () => {
             {prevPrompts.map((prompt, index) => {
               // Limit the display text to 30 characters
               const displayText = prompt.length > 30 
-                ? prompt.substring(0, 30) + "..." 
+                ? prompt.substring(0, 30) + "..."
                 : prompt;
                 
               return (
@@ -58,7 +58,7 @@ const Sidebar = () => {
           {extended && <p>Help</p>}
         </div>
         <div className="bottom-item recent-entry">
-          <img src={assets.history_icon} alt="Activity" />
+          <img src={ assets.history_icon} alt="Activity" />
           {extended && <p>Activity</p>}
         </div>
         <div className="bottom-item recent-entry">

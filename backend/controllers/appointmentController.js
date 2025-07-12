@@ -7,7 +7,6 @@ const createAppointment = async (req, res) => {
     try {
         const { doctorId, appointmentDate, appointmentTime, patientName, patientEmail } = req.body;
 
-        // Validate required fields
         if (!doctorId || !appointmentDate || !appointmentTime || !patientName || !patientEmail) {
             return res.status(400).json({
                 success: false,
@@ -15,34 +14,12 @@ const createAppointment = async (req, res) => {
             });
         }
 
-        // Validate doctorId format
-        if (!mongoose.Types.ObjectId.isValid(doctorId)) {
-            return res.status(400).json({
-                success: false,
-                message: 'Invalid doctor ID format'
-            });
-        }
+        // Check doctor by either _id or externalId
+        const doctorQuery = mongoose.Types.ObjectId.isValid(doctorId) 
+            ? { _id: doctorId }
+            : { externalId: doctorId };
 
-        // Validate date format and ensure it's not in the past
-        const appointmentDateTime = new Date(appointmentDate);
-        if (isNaN(appointmentDateTime.getTime())) {
-            return res.status(400).json({
-                success: false,
-                message: 'Invalid appointment date format'
-            });
-        }
-
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        if (appointmentDateTime < today) {
-            return res.status(400).json({
-                success: false,
-                message: 'Appointment date cannot be in the past'
-            });
-        }
-
-        // Check if doctor exists
-        const doctor = await doctorModel.findById(doctorId);
+        const doctor = await doctorModel.findOne(doctorQuery)
         if (!doctor) {
             return res.status(404).json({
                 success: false,
@@ -50,8 +27,7 @@ const createAppointment = async (req, res) => {
             });
         }
 
-        // Check if doctor is available
-        if (!doctor.Available) {
+        if (!doctor.availability) {
             return res.status(400).json({
                 success: false,
                 message: 'Doctor is not available for appointments'
@@ -59,22 +35,22 @@ const createAppointment = async (req, res) => {
         }
 
         // Create new appointment
-        const appointment = new appointmentModel({
-            doctor: doctorId,
-            appointmentDate,
-            appointmentTime,
+        const newAppointment = new appointmentModel({
+            doctor: doctor._id, // Store doctor's _id
             patientName,
             patientEmail,
-            status: 'pending',
-            fees: doctor.fees
+            appointmentDate,
+            appointmentTime,
+            fees: doctor.fees, // Include doctor's fees
+            status: 'pending'
         });
 
-        await appointment.save();
+        await newAppointment.save();
 
         res.status(201).json({
             success: true,
             message: 'Appointment booked successfully',
-            appointment
+            appointment: newAppointment
         });
 
     } catch (error) {
@@ -164,4 +140,27 @@ const updateAppointmentStatus = async (req, res) => {
     }
 };
 
-export { createAppointment, getPatientAppointments, updateAppointmentStatus };
+// Get appointments by doctor ID
+const getDoctorAppointments = async (req, res) => {
+    try {
+        const { doctorId } = req.params;
+        
+        const appointments = await appointmentModel.find({ doctor: doctorId })
+            .sort({ appointmentDate: 1 });
+
+        res.json({
+            success: true,
+            appointments
+        });
+
+    } catch (error) {
+        console.error('Error in getDoctorAppointments:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch appointments',
+            error: error.message
+        });
+    }
+};
+
+export { createAppointment, getPatientAppointments, updateAppointmentStatus, getDoctorAppointments };

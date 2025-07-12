@@ -98,6 +98,8 @@ const Appointment = () => {
           <div>
             <p className='flex items-center gap-1 text-sm font-medium text-gray-900 mt-3'>About <img src={assets.info_icon} alt="" /></p>
             <p className='text-sm text-gray-500 max-w-[700px] mt-1'>{docInfo.about}</p>
+            <p className='text-sm text-gray-500 mt-1'>{docInfo.address.address1}</p>
+            <p className='text-sm text-gray-500 mt-1'>{docInfo.address.address2}</p>
           </div>
           <p className='text-gray-500 font-medium mt-4 '>
             Appointment Fee: <span className='text-gray-600'>{currencySymbol}{docInfo.fees}</span>
@@ -126,7 +128,7 @@ const Appointment = () => {
           ))}
         </div>
         <button 
-          onClick={() => {
+          onClick={async () => {
             if (!slotTime) {
               toast.error('Please select a time slot')
               return
@@ -155,13 +157,13 @@ const Appointment = () => {
                 patientEmail: user.email
               }
 
-              // Add appointment using context
-              addAppointment(appointment)
+              // Add appointment using context (now async)
+              await addAppointment(appointment)
               toast.success('Appointment booked successfully!')
               navigate('/my-appointment')
             } catch (error) {
               console.error('Error booking appointment:', error)
-              toast.error('Failed to book appointment. Please try again.')
+              toast.error(error.message || 'Failed to book appointment. Please try again.')
             }
           }} 
           className='bg-[#5f6fff] text-white text-sm font-light px-14 py-3 rounded-full my-6 hover:bg-[#4f5fee] transition-all duration-300'
