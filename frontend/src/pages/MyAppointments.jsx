@@ -37,9 +37,6 @@ const MyAppointments = () => {
             <div className='flex-1 text-sm text-zinc-600'>
               <p className='text-neutral-800 font-semibold'>{item.name}</p>
               <p>{item.speciality}</p>
-              <p className='text-zinc-700 font-medium mt-1'>Adress:</p>
-              <p className='text-xs'>{item.doctor.address.address1}</p>
-              <p className='text-xs'>{item.doctor.address.address2}</p>
               <p className='text--sm mt-1'>
                 <span className='text-sm text-neutral-700 font-medium'>Date & Time:</span> {new Date(item.appointmentDate).toLocaleDateString()} | {item.appointmentTime}
               </p>
